@@ -662,11 +662,13 @@ class PrimaryIntegrityMeasuresTaker:
             self._output_PDB_file = output_pdb_file
         else:
             self._output_PDB_file = sicc_af_dir/(input_pdb_file.stem + '_corrected.pdb')
+        self._output_PDB_file.parent.mkdir(exist_ok=True, parents=True)
 
         if json_logs_dir:
             self.json_logs_dir = json_logs_dir
         else:
             self.json_logs_dir = sicc_af_dir
+        self.json_logs_dir.mkdir(parents = True, exist_ok = True)
 
         self._from_executor = from_executor
         self._log = ''
@@ -761,9 +763,10 @@ class PrimaryIntegrityMeasuresTaker:
                 rmtree(self._correction_dir)
             else:
                 if self._log_file:
-                    self._log_file.parent.mkdir(exist_ok=True)
+                    self._log_file.parent.mkdir(exist_ok = True, parents = True)
                 else:
                     self._log_file = self._correction_dir/'log.txt'
+                    self._log_file.parent.mkdir(exist_ok = True, parents = True)
                 with open(self._log_file, mode='a') as log_file:
                     log_file.write(self._log)
 

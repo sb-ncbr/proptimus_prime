@@ -68,7 +68,7 @@ if __name__ == '__main__':
             print(l*'\b' + f'{i}', end='', flush=True)
 
     # save results
-    print('INFO: Writing results...', end='')
+    print('\nINFO: Writing results...', end='')
     with open(args.input_PDB_dir/'results.py', mode='w') as f:
         f.write('side_chain_errors = ')
         f.write(repr(side_chain_errors))
