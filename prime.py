@@ -656,18 +656,18 @@ class PrimaryIntegrityMeasuresTaker:
             exit(3)
 
         self._input_pdb_file = input_pdb_file
-        sicc_af_dir = input_pdb_file.parent/'correction_sicc_af'
-        self._correction_dir = sicc_af_dir/(input_pdb_file.stem[3:-12]+'_correction')
+        prime_dir = input_pdb_file.parent/'correction_prime'
+        self._correction_dir = prime_dir/(input_pdb_file.stem[3:-12]+'_correction')
         if output_pdb_file:
             self._output_PDB_file = output_pdb_file
         else:
-            self._output_PDB_file = sicc_af_dir/(input_pdb_file.stem + '_corrected.pdb')
+            self._output_PDB_file = prime_dir/(input_pdb_file.stem + '_corrected.pdb')
         self._output_PDB_file.parent.mkdir(exist_ok=True, parents=True)
 
         if json_logs_dir:
             self.json_logs_dir = json_logs_dir
         else:
-            self.json_logs_dir = sicc_af_dir
+            self.json_logs_dir = prime_dir
         self.json_logs_dir.mkdir(parents = True, exist_ok = True)
 
         self._from_executor = from_executor
@@ -748,7 +748,7 @@ class PrimaryIntegrityMeasuresTaker:
                               f'Chain errors\n'
                               f'--------------------------\n'
                               f'{chain_errors_string}\n')
-                print_output('WARNING: sicc_af does not provide correction of errors in the backbone.', self._silent)
+                print_output('WARNING: Proptimus prime does not provide correction of errors in the backbone.', self._silent)
 
                 if self._from_executor:
                     backbone_errors = [[(res_id, protein.residues[res_id].confidence) for res_id in error]
