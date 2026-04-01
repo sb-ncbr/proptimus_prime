@@ -14,6 +14,11 @@ def load_arguments():
                         type    = Path,
                         help    = 'Directory with PDB files of structures to be corrected.'
                         )
+    parser.add_argument('-nc','--n_cores',
+                        type    = int,
+                        nargs   = '?',
+                        default = 1,
+                        help    = 'Number of cores to parallelize over.')
 
     parameters = parser.parse_args()
     return parameters
@@ -36,6 +41,7 @@ if __name__ == '__main__':
     # load arguments
     args = load_arguments()
     input_dir = args.input_PDB_dir
+    n_cores = args.n_cores
 
     # prepare directories
     finished_dir  = input_dir/'finished'
@@ -52,7 +58,7 @@ if __name__ == '__main__':
     # run prime on all files parallelly on 10 CPU cores
     files_n = len([x for x in input_dir.glob('*.pdb')])
     print(f'{files_n}\\0', end='', flush=True)
-    with Pool(10) as pool:
+    with Pool(n_cores) as pool:
         for i, result in enumerate(pool.imap_unordered(replica, input_dir.glob('*.pdb'), chunksize=64), start=1):
             uniprotkb_ac = result.uniprotkb_ac
             if result.side_chain_errors:
