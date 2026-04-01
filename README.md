@@ -19,22 +19,23 @@ pip install -r requirements.txt
 ```
 
 ### Execution
-#### One file
+#### Single file analysis
 ```bash
 python prime.py <input> [output] [-l log] [-d -s]
 ```
-#### Batch run
-This runs PRIME over all structures in a folder, using 10 CPU cores. This was used for the analysis of Swiss-Prot-proteins predictions in [AlphaFold DB](https://alphafold.com/).
-```bash
-python executor_prime.py <input_dir> [-n n_cores] 
-```
-
 input: path to the PDB file to process (mandatory)\
 output: path to the corrected file (optional)\
 log: path to the log file (optional, must be preceded by -l)\
 -d: delete auxiliary files (also deletes the log file, if its path has not been specified)\
 -s: silent mode
-input_dir: path to the directory with PDB files (mandatory)
+
+#### Batch run
+This runs PRIME over all structures in a folder. This was used for the analysis of Swiss-Prot-proteins predictions in [AlphaFold DB](https://alphafold.com/).
+```bash
+python executor_prime.py <input_dir> [-c n_cores] 
+```
+input_dir: path to the directory with PDB files (mandatory)\
+n_cores: number of CPU cores to parallelize over
 
 ## Python library integration
 Import the PrimaryIntegrityMeasuresTaker into your Python script. All options listed in [Command line use](#command-line-use) are

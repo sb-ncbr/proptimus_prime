@@ -14,7 +14,7 @@ def load_arguments():
                         type    = Path,
                         help    = 'Directory with PDB files of structures to be corrected.'
                         )
-    parser.add_argument('-nc','--n_cores',
+    parser.add_argument('-c', '--n_cores',
                         type    = int,
                         nargs   = '?',
                         default = 1,
