@@ -4,3 +4,4 @@ biopython~=1.85
 pdb2pqr~=3.6.1
 rdkit~=2025.3.5
 scikit-learn~=1.7.1
+networkx~=3.6.1
