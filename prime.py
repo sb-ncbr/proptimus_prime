@@ -407,12 +407,12 @@ class Protein:
                     side_chain_err_ress_ids = [bio_residues[res_id].id[1] for res_id in sorted(side_chain_err_ress_ats.keys())]
                     import networkx as nx
                     edges = []
-                    for a1, a2 in interrezidual_clashes:
+                    for r1, r2 in interrezidual_clashes:
                         try:
-                            edges.append((side_chain_err_ress_ids.index(a1), side_chain_err_ress_ids.index(a2)))
+                            edges.append((side_chain_err_ress_ids.index(r1), side_chain_err_ress_ids.index(r2)))
                         except ValueError:
+                            print(f"Residues {r1} and {r2} are not described as errorneous.")
                             continue
-                    edges = [ ]
                     G = nx.Graph()
                     G.add_edges_from(edges)
                     G.add_nodes_from(range(len(side_chain_err_ress_ids)))
