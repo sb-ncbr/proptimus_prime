@@ -239,6 +239,7 @@ class Protein:
         # make a set of bonded atoms' NEF names for each atom, meanwhile check for interresidual clashes
         backbone_err_ress   : set[tuple[int, ...]]  = set()
         side_chain_err_ats  : set[Atom]             = set()
+        interrezidual_clashes = []
         for bond in rdkit_molecule.GetBonds():
             a1_name = bond.GetBeginAtom().GetPDBResidueInfo().GetName().strip()
             a2_name = bond.GetEndAtom().GetPDBResidueInfo().GetName().strip()
@@ -260,6 +261,11 @@ class Protein:
             # load additional information
             a1_res_id = atom1.res_id
             a2_res_id = atom2.res_id
+
+            # save clashing atoms
+            if a1_res_id != a2_res_id:
+                if not (abs(a2_res_id - a1_res_id) == 1 and ats_names == {{'N', 'C'}}):
+                    interrezidual_clashes.append((a1_res_id, a2_res_id))
 
             # if the bond is within the same residue or is eupeptidic, add to the set, except for intraresidual backbone clashes
             if a1_res_id == a2_res_id:
@@ -397,6 +403,24 @@ class Protein:
                 if len(side_chain_err_ress_ats) == 1:
                     side_chain_err_ress_clusters = [{self.residues[list(side_chain_err_ress_ats.keys())[0]]}]
                 else:
+                    side_chain_err_ress = [bio_residues[res_id] for res_id in sorted(side_chain_err_ress_ats.keys())]
+                    side_chain_err_ress_ids = [bio_residues[res_id].id[1] for res_id in sorted(side_chain_err_ress_ats.keys())]
+                    import networkx as nx
+                    edges = []
+                    for a1, a2 in interrezidual_clashes:
+                        try:
+                            edges.append((side_chain_err_ress_ids.index(a1), side_chain_err_ress_ids.index(a2)))
+                        except ValueError:
+                            continue
+                    edges = [ ]
+                    G = nx.Graph()
+                    G.add_edges_from(edges)
+                    G.add_nodes_from(range(len(side_chain_err_ress_ids)))
+                    clusters = []
+                    for cluster in list(nx.connected_components(G)):
+                        clusters.append(set([side_chain_err_ress[i] for i in cluster]))
+
+                """
                     side_chain_err_ress_centres = [bio_residues[res_id].center_of_mass(geometric=True)
                                                    for res_id in sorted(side_chain_err_ress_ats.keys())]
                     clustering_engine = AgglomerativeClustering(n_clusters          = None,
@@ -406,6 +430,7 @@ class Protein:
                     for cluster_id, res_id in zip(clustering_engine.labels_,
                                                   sorted(side_chain_err_ress_ats.keys())):
                         side_chain_err_ress_clusters[cluster_id].add(self.residues[res_id])
+                    """
 
                 # get surrounding residues for each cluster
                 kdtree              : BioNeighbourSearch    = BioNeighbourSearch(list(self._bio_structure.get_atoms()))
