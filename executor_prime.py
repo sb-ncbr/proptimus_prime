@@ -4,6 +4,8 @@ from collections import namedtuple
 from multiprocessing import Pool
 from pickle import dump
 from pathlib import Path
+from plistlib import InvalidFileException
+from time import time
 
 Return_tuple    = namedtuple('Return_tuple', ['uniprotkb_ac', 'side_chain_errors', 'backbone_errors', 'pdb2pqr_error_log', 'exit_code'])
 Log_tuple       = namedtuple('Log_tuple', ['side_chain_errors', 'backbone_errors', 'pdb2pqr_error_log', 'general_error_log'])
@@ -26,15 +28,23 @@ def load_arguments():
 
 def replica(file: Path):
     try:
-        return PrimaryIntegrityMeasuresTaker(input_pdb_file  = file,
-                                             from_executor   = True,
-                                             log_file        = file.parent/'log.log',
-                                             silent          = True,
-                                             json_logs_dir   = file.parent/'logs').process_structure()
+        return PrimaryIntegrityMeasuresTaker(input_pdb_file         = file,
+                                             from_executor          = True,
+                                             delete_auxiliary_files = True,
+                                             silent                 = True,
+                                             json_logs_dir          = file.parent/'logs').process_structure()
     except SystemExit as e:
         return Return_tuple(file.stem[3:-12], None, None, None, e.code)
-    except:
+    except NotImplementedError:
         return Return_tuple(file.stem[3:-12], None, None, None, 1)
+    except FileNotFoundError:
+        return Return_tuple(file.stem[3:-12], None, None, None, 2)
+    except InvalidFileException:
+        return Return_tuple(file.stem[3:-12], None, None, None, 4)
+    except ValueError:
+        return Return_tuple(file.stem[3:-12], None, None, None, 3)
+    except RuntimeError:
+        return Return_tuple(file.stem[3:-12], None, None, None, 5)
 
 if __name__ == '__main__':
     from prime import PrimaryIntegrityMeasuresTaker
@@ -44,23 +54,18 @@ if __name__ == '__main__':
     input_dir = args.input_PDB_dir
     n_cores = args.n_cores
 
-    # prepare directories
-    finished_dir  = input_dir/'finished'
-    json_logs_dir = input_dir/'logs'
-    finished_dir.mkdir(exist_ok=True)
-    json_logs_dir.mkdir(exist_ok=True)
-
     # prepare data structures
     side_chain_errors   = {}
     backbone_errors     = {}
     pdb2pqr_error_log   = {}
     general_error_log   = []
 
-    # run prime on all files parallelly on 10 CPU cores
+    # run prime on all files parallelly on the specified number of CPU cores
     files_n = len([x for x in input_dir.glob('*.pdb')])
     print(f'{files_n}\\0', end='', flush=True)
+    start = time()
     with Pool(n_cores) as pool:
-        for i, result in enumerate(pool.imap_unordered(replica, input_dir.glob('*.pdb'), chunksize=64), start=1):
+        for i, result in enumerate(pool.imap_unordered(replica, input_dir.glob('*.pdb'), chunksize=1), start=1):
             uniprotkb_ac = result.uniprotkb_ac
             if result.side_chain_errors:
                 side_chain_errors[uniprotkb_ac] = result.side_chain_errors
@@ -73,7 +78,8 @@ if __name__ == '__main__':
 
             l = len(str(i-1))
             print(l*'\b' + f'{i}', end='', flush=True)
-
+    end = time()
+    print(f'\nINFO: Calculated in {end - start:.1f} seconds.', end='')
     # save results
     print('\nINFO: Writing results...', end='')
     with open(args.input_PDB_dir/'results.py', mode='w') as f:

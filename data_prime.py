@@ -207,7 +207,7 @@ archetypes = {'ALA':
               }
 distance = {'A': 0, 'B': 1, 'G': 2, 'D': 3, 'E': 4, 'Z': 5, 'H': 6}
 proline_distance = {'A': 0, 'B': 1, 'G': 2, 'D': 1}
-residues_cycles_atoms: dict[str, list[list[str]]] = \
+cyclic_residues_atoms: dict[str, list[list[str]]] = \
     {'PHE': [['CG',  'CD1', 'CD2', 'CE1', 'CE2', 'CZ']],
      'HIS': [['CG',  'ND1', 'CD2', 'CE1', 'NE2']],
      'PRO': [['N',   'CA',  'CD',  'CB',  'CG']],
