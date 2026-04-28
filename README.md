@@ -3,12 +3,12 @@
 PROPTIMUS PRIME: **P**er-**r**esidue **optim**isation of protein str**u**cture**s**: **Pr**imary **i**ntegrity **me**asures
 
 PROPTIMUS PRIME is a workflow providing repair of amino-acid side chains in protein structures predicted by the [AlphaFold2](https://www.nature.com/articles/s41586-021-03819-2)
-algorithm. It can be either run locally as a command line application or integrated as a regular Python library.
+algorithm. It can be either run locally as a command-line application or integrated as a regular Python library.
 It uses the following libraries: [Biopython](https://doi.org/10.1093/bioinformatics/btp163), [RDKit](https://www.rdkit.org/),
  [scikit-learn](https://dl.acm.org/doi/10.5555/1953048.2078195), and the [PDB2PQR](https://doi.org/10.1093/nar/gkh381)
 suite.
 
-## Command line use
+## Run in the Python virtual environment
 ### Setup
 ```bash
 git clone https://github.com/sb-ncbr/proptimus_prime
@@ -37,7 +37,33 @@ python executor_prime.py <input_dir> [-c n_cores]
 input_dir: path to the directory with PDB files (mandatory)\
 n_cores: number of CPU cores to parallelize over
 
+## Running in the Docker container
+```bash
+# prepare the repository
+git clone https://github.com/sb-ncbr/proptimus_prime
+cd proptimus_prime/
+
+# build the Docker image
+docker build -t local/proptimus-prime .
+# or download the image from the registry
+docker pull cerit.io/ceitec-biodata-pub/proptimus-prime:latest
+
+# run a single computation in the container
+docker run --rm --name proptimus \
+  -v ./examples:/opt/proptimus/examples \
+  local/proptimus-prime \
+  python3 prime.py examples/AF-A4QJE9-F1-model_v6.pdb
+
+# or run the batch run
+docker run --rm --name proptimus \
+  -v ./examples:/opt/proptimus/examples \
+  local/proptimus-prime \
+  python3 executor_prime.py examples
+
+# results will be stored in the examples folder
+```
+
 ## Python library integration
-Import the PrimaryIntegrityMeasuresTaker into your Python script. All options listed in [Command line use](#command-line-use) are
+Import the PrimaryIntegrityMeasuresTaker into your Python script. All options listed in [Execution](#execution) section are
 available within the constructor parameters. The logger parameter is used for processing large sets of PDB files using a
 custom script. Ignore for casual use.
