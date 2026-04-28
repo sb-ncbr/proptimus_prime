@@ -265,7 +265,7 @@ class Protein:
 
             # save clashing atoms
             if a1_res_id != a2_res_id:
-                if not (abs(a2_res_id - a1_res_id) == 1 and ats_names == {{'N', 'C'}}):
+                if not (abs(a2_res_id - a1_res_id) == 1 and ats_names == {'N', 'C'}):
                     interrezidual_clashes.append((a1_res_id, a2_res_id))
 
             # if the bond is within the same residue or is eupeptidic, add to the set, except for intraresidual backbone clashes
