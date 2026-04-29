@@ -8,7 +8,7 @@ It uses the following libraries: [Biopython](https://doi.org/10.1093/bioinformat
  [scikit-learn](https://dl.acm.org/doi/10.5555/1953048.2078195), and the [PDB2PQR](https://doi.org/10.1093/nar/gkh381)
 suite.
 
-## Run in the Python virtual environment
+## Running in a Python virtual environment
 ### Setup
 ```bash
 git clone https://github.com/sb-ncbr/proptimus_prime
@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ```
 
 ### Execution
-#### Single file analysis
+#### Single-file analysis
 ```bash
 python prime.py <input> [output] [-l log] [-d -s]
 ```
@@ -37,7 +37,7 @@ python executor_prime.py <input_dir> [-c n_cores]
 input_dir: path to the directory with PDB files (mandatory)\
 n_cores: number of CPU cores to parallelize over
 
-## Running in the Docker container
+## Running in a Docker container
 ```bash
 # prepare the repository
 git clone https://github.com/sb-ncbr/proptimus_prime
@@ -62,6 +62,29 @@ docker run --rm --name proptimus \
 
 # results will be stored in the examples folder
 ```
+
+## Output
+In [Single-file analysis](#single-file-analysis), the user is provided with information about the whole process as can
+be seen below:
+```
+INFO: loading file...
+INFO: AF-O15085-F1-model_v4.pdb loaded
+INFO: correcting cluster 1: residues 1
+INFO: trying with debump...
+INFO: success
+INFO: correcting cluster 2: residues 895
+INFO: success
+RESULTS:
+Clustered error residues    Correction result
+--------------------------  -------------------
+1                           success
+895                         success
+CORRECTION SUCCESSFUL for AF-O15085-F1-model_v4.pdb
+INFO: In AF-O15085-F1-model_v4.pdb, backbone errors were found in these residues:
+1257
+WARNING: Proptimus prime does not provide correction of errors in the backbone.
+```
+Whatever the running mode, user is also provided JSON logs for each processed file containing detailed information. 
 
 ## Python library integration
 Import the PrimaryIntegrityMeasuresTaker into your Python script. All options listed in [Execution](#execution) section are
